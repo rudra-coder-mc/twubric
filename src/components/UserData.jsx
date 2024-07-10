@@ -28,16 +28,16 @@ const UserData = (data) => {
   return (
     <div className="grid grid-rows-3 border border-black ">
       <div className="row-span-1 grid grid-cols-12 border border-black p-1">
-        <div className="col-span-10 font-bold p-1 border border-r-2 border-r-black">
+        <div className="col-span-10 font-bold p-1  border-r-2 border-r-black">
           {fullname}
         </div>
         <div className="col-span-2 text-center  p-1">{total}</div>
       </div>
       <div className="row-span-1 grid grid-cols-12 border border-black p-1">
-        <div className="col-span-4 text-center p-1 border border-r-2 border-r-black">
+        <div className="col-span-4 text-center p-1  border-r-2 border-r-black">
           {friends} Friends
         </div>
-        <div className="col-span-4 text-center p-1 border border-r-2 border-r-black">
+        <div className="col-span-4 text-center p-1  border-r-2 border-r-black">
           {influence} Influence
         </div>
         <div className="col-span-4 text-center p-1 ">
@@ -45,7 +45,7 @@ const UserData = (data) => {
         </div>
       </div>
       <div className="row-span-1 grid grid-cols-12 border border-black p-1">
-        <div className="col-span-4 text-center  p-1 border border-r-2 border-r-black">
+        <div className="col-span-4 text-center  p-1  border-r-2 border-r-black">
           {formattedDate}
         </div>
         <div className="col-span-8 font-bold text-right  p-1">

@@ -3,6 +3,28 @@ import UserData from "./components/UserData";
 
 const App = () => {
   const [userData, setUserData] = useState([]);
+  const [sortData, setSortData] = useState("");
+  const [sortOrder, setSortOrder] = useState("asc");
+
+  const handelSort = (e) => {
+    // console.log(e.target.value);
+    let sort = e.target.value;
+    const sortedData = [...userData].sort((a, b) => {
+      let sortDiff;
+      if (e.target.value == "total") {
+        sortDiff = a.twubric.total - b.twubric.total;
+      } else if (e.target.value == "friends") {
+        sortDiff = a.twubric.friends - b.twubric.friends;
+      } else if (e.target.value == "influence") {
+        sortDiff = a.twubric.influence - b.twubric.influence;
+      } else if (e.target.value == "chirpiness") {
+        sortDiff = a.twubric.chirpiness - b.twubric.chirpiness;
+      }
+      return sortOrder === "asc" ? sortDiff : -sortDiff;
+    });
+    setSortData(sortedData);
+    setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -24,16 +46,32 @@ const App = () => {
       <section className="m-2">
         <p className="font-bold">Sort By</p>
         <div className="grid grid-cols-12 gap-3 ">
-          <button className="col-span-3 border border-black rounded-md  p-1">
+          <button
+            className="col-span-3 border border-black rounded-md  p-1"
+            value="total"
+            onClick={handelSort}
+          >
             Twubric Score
           </button>
-          <button className="col-span-3 border border-black rounded-md p-1">
+          <button
+            className="col-span-3 border border-black rounded-md p-1"
+            value="friends"
+            onClick={handelSort}
+          >
             Friends
           </button>
-          <button className="col-span-3 border border-black rounded-md p-1">
+          <button
+            className="col-span-3 border border-black rounded-md p-1"
+            value="influence"
+            onClick={handelSort}
+          >
             Influence
           </button>
-          <button className="col-span-3 border border-black rounded-md p-1">
+          <button
+            className="col-span-3 border border-black rounded-md p-1"
+            value="chirpiness"
+            onClick={handelSort}
+          >
             Chirpiness
           </button>
         </div>
@@ -54,8 +92,10 @@ const App = () => {
         </div>
       </section>
       <section className="flex flex-col w-1/3 gap-3">
-        {userData &&
+        {!sortData &&
           userData.map((data) => <UserData data={data} key={data.uid} />)}
+        {sortData &&
+          sortData.map((data) => <UserData data={data} key={data.uid} />)}
       </section>
     </div>
     // <UserData />
