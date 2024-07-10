@@ -4,9 +4,23 @@ import UserData from "./components/UserData";
 const App = () => {
   const [userData, setUserData] = useState([]);
   const [sortData, setSortData] = useState("");
+  const [filterData, setFilterData] = useState("");
   const [sortOrder, setSortOrder] = useState("asc");
   const [sortInfo, setSortInfo] = useState("");
   const [DeleteID, setDeleteID] = useState();
+
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
+
+  const handleStartDateChange = (event) => {
+    setStartDate(new Date(event.target.value).getTime() / 1000); // Convert to seconds since epoch
+    console.log(event.target.value);
+  };
+
+  const handleEndDateChange = (event) => {
+    setEndDate(new Date(event.target.value).getTime() / 1000);
+    console.log(event.target.value);
+  };
 
   const handelSort = (e) => {
     // console.log(e.target.value);
@@ -44,10 +58,40 @@ const App = () => {
   }, []);
   useEffect(() => {
     setUserData(userData.filter((item) => item.uid !== DeleteID));
+    setFilterData(filterData.filter((item) => item.uid !== DeleteID));
+    setSortData(sortData.filter((item) => item.uid !== DeleteID));
   }, [DeleteID]);
+
+  useEffect(() => {
+    let filteredData;
+    if (sortData) {
+      filteredData = sortData.filter((item) => {
+        const joinDate = item.join_date; // Assuming join_date is a UNIX timestamp
+
+        // Ensure both dates are selected before filtering
+        if (!startDate || !endDate) return true; // Include all data if no dates selected
+
+        return joinDate >= startDate && joinDate <= endDate;
+      });
+    } else {
+      filteredData = userData.filter((item) => {
+        const joinDate = item.join_date; // Assuming join_date is a UNIX timestamp
+
+        // Ensure both dates are selected before filtering
+        if (!startDate || !endDate) return true; // Include all data if no dates selected
+
+        return joinDate >= startDate && joinDate <= endDate;
+      });
+    }
+
+    setFilterData(filteredData);
+  }, [startDate, endDate, sortData, userData]);
 
   // console.log(userData);
   // console.log(DeleteID);
+  // console.log(userData);
+  // console.log(sortData);
+  // console.log(filterData);
   return (
     <div className="flex flex-col items-center gap-7 m-5 bg-gray-100">
       <section className="m-2">
@@ -91,10 +135,12 @@ const App = () => {
           <input
             type="date"
             className="col-span-6 border border-black rounded-md  p-1"
+            onChange={handleStartDateChange}
           />
           <input
             type="date"
             className="col-span-6 border border-black rounded-md  p-1"
+            onChange={handleEndDateChange}
           />
         </div>
       </section>
@@ -106,11 +152,17 @@ const App = () => {
           </p>
         )}
         {!sortData &&
+          !filterData &&
           userData.map((data) => (
             <UserData data={data} setDeleteID={setDeleteID} key={data.uid} />
           ))}
-        {sortData &&
+        {!filterData &&
+          sortData &&
           sortData.map((data) => (
+            <UserData data={data} setDeleteID={setDeleteID} key={data.uid} />
+          ))}
+        {filterData &&
+          filterData.map((data) => (
             <UserData data={data} setDeleteID={setDeleteID} key={data.uid} />
           ))}
       </section>
