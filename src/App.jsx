@@ -5,6 +5,8 @@ const App = () => {
   const [userData, setUserData] = useState([]);
   const [sortData, setSortData] = useState("");
   const [sortOrder, setSortOrder] = useState("asc");
+  const [sortInfo, setSortInfo] = useState("");
+  const [DeleteID, setDeleteID] = useState();
 
   const handelSort = (e) => {
     // console.log(e.target.value);
@@ -23,6 +25,7 @@ const App = () => {
       return sortOrder === "asc" ? sortDiff : -sortDiff;
     });
     setSortData(sortedData);
+    setSortInfo({ type: e.target.textContent, order: sortOrder });
     setSortOrder(sortOrder === "asc" ? "desc" : "asc");
   };
 
@@ -39,8 +42,12 @@ const App = () => {
 
     fetchData();
   }, []);
+  useEffect(() => {
+    setUserData(userData.filter((item) => item.uid !== DeleteID));
+  }, [DeleteID]);
 
   // console.log(userData);
+  // console.log(DeleteID);
   return (
     <div className="flex flex-col items-center gap-7 m-5 bg-gray-100">
       <section className="m-2">
@@ -91,11 +98,21 @@ const App = () => {
           />
         </div>
       </section>
+
       <section className="flex flex-col w-1/3 gap-3">
+        {sortInfo && (
+          <p>
+            sort by {sortInfo.type} in {sortInfo.order} Order
+          </p>
+        )}
         {!sortData &&
-          userData.map((data) => <UserData data={data} key={data.uid} />)}
+          userData.map((data) => (
+            <UserData data={data} setDeleteID={setDeleteID} key={data.uid} />
+          ))}
         {sortData &&
-          sortData.map((data) => <UserData data={data} key={data.uid} />)}
+          sortData.map((data) => (
+            <UserData data={data} setDeleteID={setDeleteID} key={data.uid} />
+          ))}
       </section>
     </div>
     // <UserData />

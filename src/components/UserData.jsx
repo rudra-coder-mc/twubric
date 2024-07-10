@@ -10,7 +10,8 @@ const UserData = (data) => {
     chirpiness = data.data.twubric.chirpiness,
     join_date,
   } = data.data;
-  // console.log(data.data);
+  // console.log(data.setDeleteID);
+
   const date = new Date(join_date * 1000);
 
   // Format the date in "dd/mm/yyyy" using a different order
@@ -20,10 +21,6 @@ const UserData = (data) => {
 
   const formattedDate = date.toLocaleString().slice(0, 10);
   // console.log(formattedDate);
-
-  const removeUser = (Id) => {
-    console.log(Id);
-  };
 
   return (
     <div className="grid grid-rows-3 border border-black ">
@@ -49,7 +46,7 @@ const UserData = (data) => {
           {formattedDate}
         </div>
         <div className="col-span-8 font-bold text-right  p-1">
-          <button onClick={() => removeUser(uid)}>Remove</button>
+          <button onClick={() => data.setDeleteID(uid)}>Remove</button>
         </div>
       </div>
     </div>
