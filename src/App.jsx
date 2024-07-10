@@ -3,8 +3,7 @@ import UserData from "./components/UserData";
 
 const App = () => {
   const [userData, setUserData] = useState([]);
-  const [sortData, setSortData] = useState("");
-  const [filterData, setFilterData] = useState("");
+  const [displayedData, setDisplayedData] = useState([]); // Combined state for displaying data
   const [sortOrder, setSortOrder] = useState("asc");
   const [sortInfo, setSortInfo] = useState("");
   const [DeleteID, setDeleteID] = useState();
@@ -14,16 +13,15 @@ const App = () => {
 
   const handleStartDateChange = (event) => {
     setStartDate(new Date(event.target.value).getTime() / 1000); // Convert to seconds since epoch
-    console.log(event.target.value);
+    // console.log(event.target.value);
   };
 
   const handleEndDateChange = (event) => {
     setEndDate(new Date(event.target.value).getTime() / 1000);
-    console.log(event.target.value);
+    // console.log(event.target.value);
   };
 
   const handelSort = (e) => {
-    // console.log(e.target.value);
     let sort = e.target.value;
     const sortedData = [...userData].sort((a, b) => {
       let sortDiff;
@@ -33,65 +31,61 @@ const App = () => {
         sortDiff = a.twubric.friends - b.twubric.friends;
       } else if (e.target.value == "influence") {
         sortDiff = a.twubric.influence - b.twubric.influence;
+        // console.log(sortDiff);
       } else if (e.target.value == "chirpiness") {
         sortDiff = a.twubric.chirpiness - b.twubric.chirpiness;
       }
       return sortOrder === "asc" ? sortDiff : -sortDiff;
     });
-    setSortData(sortedData);
+    setDisplayedData(sortedData);
     setSortInfo({ type: e.target.textContent, order: sortOrder });
     setSortOrder(sortOrder === "asc" ? "desc" : "asc");
   };
 
   useEffect(() => {
     const fetchData = async () => {
-      const response = await fetch(
-        "https://gist.githubusercontent.com/pandemonia/21703a6a303e0487a73b2610c8db41ab/raw/82e3ef99cde5b6e313922a5ccce7f38e17f790ac/twubric.json"
-      );
-      const data = await response.json();
-      // Update component state or use the data here
-      // console.log(data);
-      setUserData(data);
+      try {
+        const response = await fetch(
+          "https://gist.githubusercontent.com/pandemonia/21703a6a303e0487a73b2610c8db41ab/raw/82e3ef99cde5b6e313922a5ccce7f38e17f790ac/twubric.json"
+        );
+        const data = await response.json();
+        setUserData(data);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        // Handle errors here, like displaying an error message to the user (e.g., using a state variable and conditional rendering)
+      }
     };
 
     fetchData();
   }, []);
-  useEffect(() => {
-    setUserData(userData.filter((item) => item.uid !== DeleteID));
-    setFilterData(filterData.filter((item) => item.uid !== DeleteID));
-    setSortData(sortData.filter((item) => item.uid !== DeleteID));
-  }, [DeleteID]);
 
   useEffect(() => {
-    let filteredData;
-    if (sortData) {
-      filteredData = sortData.filter((item) => {
-        const joinDate = item.join_date; // Assuming join_date is a UNIX timestamp
+    const handleFiltering = () => {
+      let filteredData = [...userData]; // Start with original data
 
-        // Ensure both dates are selected before filtering
-        if (!startDate || !endDate) return true; // Include all data if no dates selected
+      // Apply sorting if displayedData exists (using combined state)
+      if (displayedData.length) {
+        filteredData = displayedData;
+      }
 
-        return joinDate >= startDate && joinDate <= endDate;
-      });
-    } else {
-      filteredData = userData.filter((item) => {
-        const joinDate = item.join_date; // Assuming join_date is a UNIX timestamp
+      // Apply date filtering if both dates are selected
+      if (startDate && endDate) {
+        filteredData = filteredData.filter((item) => {
+          const joinDate = item.join_date;
+          return joinDate >= startDate && joinDate <= endDate;
+        });
+      }
 
-        // Ensure both dates are selected before filtering
-        if (!startDate || !endDate) return true; // Include all data if no dates selected
+      setDisplayedData(filteredData);
+    };
 
-        return joinDate >= startDate && joinDate <= endDate;
-      });
-    }
+    // Call handleFiltering on relevant state changes
+    handleFiltering();
+  }, [userData, sortOrder, startDate, endDate]);
 
-    setFilterData(filteredData);
-  }, [startDate, endDate, sortData, userData]);
-
-  // console.log(userData);
-  // console.log(DeleteID);
-  // console.log(userData);
-  // console.log(sortData);
-  // console.log(filterData);
+  useEffect(() => {
+    setDisplayedData(userData.filter((item) => item.uid !== DeleteID));
+  }, [DeleteID, userData]);
   return (
     <div className="flex flex-col items-center gap-7 m-5 bg-gray-100">
       <section className="m-2">
@@ -123,7 +117,7 @@ const App = () => {
             value="chirpiness"
             onClick={handelSort}
           >
-            Chirpiness
+            chirpiness
           </button>
         </div>
       </section>
@@ -151,23 +145,15 @@ const App = () => {
             sort by {sortInfo.type} in {sortInfo.order} Order
           </p>
         )}
-        {!sortData &&
-          !filterData &&
+        {/* {!displayedData.length &&
           userData.map((data) => (
             <UserData data={data} setDeleteID={setDeleteID} key={data.uid} />
-          ))}
-        {!filterData &&
-          sortData &&
-          sortData.map((data) => (
-            <UserData data={data} setDeleteID={setDeleteID} key={data.uid} />
-          ))}
-        {filterData &&
-          filterData.map((data) => (
-            <UserData data={data} setDeleteID={setDeleteID} key={data.uid} />
-          ))}
+          ))} */}
+        {displayedData.map((data) => (
+          <UserData data={data} setDeleteID={setDeleteID} key={data.uid} />
+        ))}
       </section>
     </div>
-    // <UserData />
   );
 };
 
