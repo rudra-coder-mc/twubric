@@ -1,35 +1,65 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React, { useEffect, useState } from "react";
+import UserData from "./components/UserData";
 
-function App() {
-  const [count, setCount] = useState(0)
+const App = () => {
+  const [userData, setUserData] = useState([]);
 
+  useEffect(() => {
+    const fetchData = async () => {
+      const response = await fetch(
+        "https://gist.githubusercontent.com/pandemonia/21703a6a303e0487a73b2610c8db41ab/raw/82e3ef99cde5b6e313922a5ccce7f38e17f790ac/twubric.json"
+      );
+      const data = await response.json();
+      // Update component state or use the data here
+      // console.log(data);
+      setUserData(data);
+    };
+
+    fetchData();
+  }, []);
+
+  // console.log(userData);
   return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+    <div className="flex flex-col items-center gap-7 m-5 bg-gray-100">
+      <section className="m-2">
+        <p className="font-bold">Sort By</p>
+        <div className="grid grid-cols-12 gap-3 ">
+          <button className="col-span-3 border border-black rounded-md  p-1">
+            Twubric Score
+          </button>
+          <button className="col-span-3 border border-black rounded-md p-1">
+            Friends
+          </button>
+          <button className="col-span-3 border border-black rounded-md p-1">
+            Influence
+          </button>
+          <button className="col-span-3 border border-black rounded-md p-1">
+            Chirpiness
+          </button>
+        </div>
+      </section>
+      <section className="m-2">
+        <p className="font-bold">Joined Twitter between</p>
+        <div className="grid grid-cols-12 gap-3 ">
+          <div className="col-span-6 border border-black   p-1">Start Date</div>
+          <div className="col-span-6 border border-black   p-1">End Date</div>
+          <input
+            type="date"
+            className="col-span-6 border border-black rounded-md  p-1"
+          />
+          <input
+            type="date"
+            className="col-span-6 border border-black rounded-md  p-1"
+          />
+        </div>
+      </section>
+      <section className="flex flex-col w-1/3 gap-3">
+        {userData &&
+          userData.map((data) => <UserData data={data} key={data.uid} />)}
+      </section>
+    </div>
+    // <UserData />
+  );
+};
 
-export default App
+export default App;
